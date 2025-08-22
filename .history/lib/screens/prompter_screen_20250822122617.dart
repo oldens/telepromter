@@ -80,7 +80,7 @@ class _PrompterScreenState extends State<PrompterScreen> {
   void _startScrolling() {
     if (!_isPlaying) return;
     
-    _scrollTimer = Timer.periodic(Duration(milliseconds: 100), (timer) {
+    _scrollTimer = Timer.periodic(Duration(milliseconds: 50), (timer) {
       if (!_isPlaying) {
         timer.cancel();
         return;
@@ -102,13 +102,13 @@ class _PrompterScreenState extends State<PrompterScreen> {
     
     final currentOffset = _scrollController.offset;
     final maxOffset = _scrollController.position.maxScrollExtent;
-    final newOffset = currentOffset + (_speed * 0.3); // Зменшено крок для плавності
+    final newOffset = currentOffset + (_speed * 0.5);
     
     if (newOffset <= maxOffset) {
       _scrollController.animateTo(
         newOffset,
-        duration: Duration(milliseconds: (200 / _speed).round()), // Збільшено тривалість
-        curve: Curves.easeOut, // Змінено на easeOut для плавності
+        duration: Duration(milliseconds: (100 / _speed).round()),
+        curve: Curves.linear,
       );
     } else {
       // Дійшли до кінця - зупиняємо
@@ -120,10 +120,10 @@ class _PrompterScreenState extends State<PrompterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF000000), // Повністю непрозорий чорний
+      backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text('Суфлер'),
-        backgroundColor: const Color(0xFF000000), // Повністю непрозорий чорний
+        backgroundColor: Colors.black,
         foregroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -145,93 +145,82 @@ class _PrompterScreenState extends State<PrompterScreen> {
           ),
         ],
       ),
-      body: Container(
-        color: const Color(0xFF000000), // Додатковий чорний фон
-        child: Stack(
-          children: [
-            // Основний текст
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: SingleChildScrollView(
-                controller: _scrollController,
-                physics: const ClampingScrollPhysics(), // Додано для плавності
-                child: Text(
-                  widget.scriptText,
-                  style: const TextStyle(
-                    color: Color(0xFFFFFFFF), // Повністю непрозорий білий
-                    fontSize: 18.0,
-                    height: 1.6,
-                    fontWeight: FontWeight.normal,
-                  ),
+      body: Stack(
+        children: [
+          // Основний текст
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              child: Text(
+                widget.scriptText,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18.0,
+                  height: 1.6,
+                  fontWeight: FontWeight.normal,
                 ),
               ),
             ),
-            
-            // Контроль швидкості
-            if (_showSpeedControl)
-              Positioned(
-                top: 20,
-                right: 20,
-                child: Container(
-                  width: 200,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF000000), // Повністю непрозорий чорний
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.white, width: 1),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.5),
-                        blurRadius: 10,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.speed, color: Colors.white, size: 20),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Швидкість: ${_speed.toStringAsFixed(1)}x',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      SliderTheme(
-                        data: SliderTheme.of(context).copyWith(
-                          activeTrackColor: Colors.blue,
-                          inactiveTrackColor: Colors.grey[600],
-                          thumbColor: Colors.blue,
-                          overlayColor: Colors.blue.withOpacity(0.2),
-                          valueIndicatorColor: Colors.blue,
-                          valueIndicatorTextStyle: const TextStyle(
+          ),
+          
+          // Контроль швидкості
+          if (_showSpeedControl)
+            Positioned(
+              top: 20,
+              right: 20,
+              child: Container(
+                width: 200,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.8),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.white, width: 1),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.speed, color: Colors.white, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Швидкість: ${_speed.toStringAsFixed(1)}x',
+                          style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 12,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                        child: Slider(
-                          value: _speed,
-                          min: 0.5,
-                          max: 8.0,
-                          divisions: 75, // (8.0 - 0.5) * 10 = 75
-                          onChanged: _onSpeedChanged,
-                          label: '${_speed.toStringAsFixed(1)}x',
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        activeTrackColor: Colors.blue,
+                        inactiveTrackColor: Colors.grey[600],
+                        thumbColor: Colors.blue,
+                        overlayColor: Colors.blue.withOpacity(0.2),
+                        valueIndicatorColor: Colors.blue,
+                        valueIndicatorTextStyle: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
                         ),
                       ),
-                    ],
-                  ),
+                      child: Slider(
+                        value: _speed,
+                        min: 0.5,
+                        max: 8.0,
+                        divisions: 75, // (8.0 - 0.5) * 10 = 75
+                        onChanged: _onSpeedChanged,
+                        label: '${_speed.toStringAsFixed(1)}x',
+                      ),
+                    ),
+                  ],
                 ),
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }
