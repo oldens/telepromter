@@ -76,29 +76,25 @@ class _PrompterScreenState extends State<PrompterScreen> {
         color: const Color(0xFF000000),
         child: Stack(
           children: [
-            // Основний текст з можливістю тапу
+            // Основний текст
             Padding(
               padding: const EdgeInsets.all(20.0),
-              child: GestureDetector(
-                onTap: _controller.togglePlayPause,
-                behavior: HitTestBehavior.opaque,
-                child: SingleChildScrollView(
-                  controller: _controller.scrollController,
-                  physics: const ClampingScrollPhysics(),
-                  child: Transform(
-                    alignment: Alignment.center,
-                    transform: Matrix4.identity()..scale(
-                      _controller.settings.isMirrored ? -1.0 : 1.0, 
-                      1.0
-                    ),
-                    child: Text(
-                      widget.scriptText,
-                      style: TextStyle(
-                        color: const Color(0xFFFFFFFF),
-                        fontSize: _controller.settings.fontSize,
-                        height: 1.6,
-                        fontWeight: FontWeight.normal,
-                      ),
+              child: SingleChildScrollView(
+                controller: _controller.scrollController,
+                physics: const ClampingScrollPhysics(),
+                child: Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.identity()..scale(
+                    _controller.settings.isMirrored ? -1.0 : 1.0, 
+                    1.0
+                  ),
+                  child: Text(
+                    widget.scriptText,
+                    style: TextStyle(
+                      color: const Color(0xFFFFFFFF),
+                      fontSize: _controller.settings.fontSize,
+                      height: 1.6,
+                      fontWeight: FontWeight.normal,
                     ),
                   ),
                 ),
