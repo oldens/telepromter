@@ -105,12 +105,46 @@ class _PrompterScreenState extends State<PrompterScreen> {
               ),
             ),
             
+            // Countdown індикатор
+            if (_controller.isCountdown)
+              Positioned.fill(
+                child: Container(
+                  color: Colors.black.withOpacity(0.8),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          _controller.countdownValue > 0 
+                            ? _controller.countdownValue.toString()
+                            : 'Старт!',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: _controller.settings.fontSize * 3,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        const Text(
+                          'Приготуйтеся...',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              
             // Панель керування
             if (_controller.showSpeedControl)
               PrompterControlPanel(
                 settings: _controller.settings,
                 onSpeedChanged: _controller.updateSpeed,
                 onFontSizeChanged: _controller.updateFontSize,
+                onDelayChanged: _controller.updateStartDelay,
               ),
           ],
         ),

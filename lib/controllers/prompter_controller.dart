@@ -8,14 +8,19 @@ class PrompterController extends ChangeNotifier {
   final StorageService _storageService = StorageService();
   
   Timer? _scrollTimer;
+  Timer? _countdownTimer;
   bool _isPlaying = false;
   bool _showSpeedControl = false;
+  bool _isCountdown = false;
+  int _countdownValue = 0;
   PrompterSettings _settings = const PrompterSettings();
   
   // Геттери
   ScrollController get scrollController => _scrollController;
   bool get isPlaying => _isPlaying;
   bool get showSpeedControl => _showSpeedControl;
+  bool get isCountdown => _isCountdown;
+  int get countdownValue => _countdownValue;
   PrompterSettings get settings => _settings;
   
   // Ініціалізація
@@ -29,11 +34,13 @@ class PrompterController extends ChangeNotifier {
       final speed = await _storageService.loadSpeed();
       final fontSize = await _storageService.loadFontSize();
       final isMirrored = await _storageService.loadMirrorMode();
+      final startDelay = await _storageService.loadStartDelay();
       
       _settings = PrompterSettings(
         speed: speed,
         fontSize: fontSize,
         isMirrored: isMirrored,
+        startDelay: startDelay,
       );
       notifyListeners();
     } catch (e) {
@@ -43,11 +50,34 @@ class PrompterController extends ChangeNotifier {
   
   // Управління відтворенням
   void togglePlayPause() {
-    if (_isPlaying) {
+    if (_isPlaying || _isCountdown) {
       _stopScrolling();
     } else {
-      _startScrolling();
+      _startCountdown();
     }
+  }
+  
+  // Countdown перед запуском
+  void _startCountdown() {
+    if (_settings.startDelay <= 0) {
+      _startScrolling();
+      return;
+    }
+    
+    _isCountdown = true;
+    _countdownValue = _settings.startDelay.ceil();
+    notifyListeners();
+    
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      _countdownValue--;
+      notifyListeners();
+      
+      if (_countdownValue <= 0) {
+        timer.cancel();
+        _isCountdown = false;
+        _startScrolling();
+      }
+    });
   }
   
   void _startScrolling() {
@@ -63,9 +93,12 @@ class PrompterController extends ChangeNotifier {
   
   void _stopScrolling() {
     _isPlaying = false;
+    _isCountdown = false;
     notifyListeners();
     _scrollTimer?.cancel();
     _scrollTimer = null;
+    _countdownTimer?.cancel();
+    _countdownTimer = null;
   }
   
   void _scrollToNextPosition() {
@@ -126,9 +159,21 @@ class PrompterController extends ChangeNotifier {
     }
   }
   
+  Future<void> updateStartDelay(double delay) async {
+    _settings = _settings.copyWith(startDelay: delay);
+    notifyListeners();
+    
+    try {
+      await _storageService.saveStartDelay(delay);
+    } catch (e) {
+      debugPrint('Помилка збереження затримки запуску: $e');
+    }
+  }
+  
   @override
   void dispose() {
     _scrollTimer?.cancel();
+    _countdownTimer?.cancel();
     _scrollController.dispose();
     super.dispose();
   }

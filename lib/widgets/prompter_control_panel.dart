@@ -5,12 +5,14 @@ class PrompterControlPanel extends StatelessWidget {
   final PrompterSettings settings;
   final ValueChanged<double> onSpeedChanged;
   final ValueChanged<double> onFontSizeChanged;
+  final ValueChanged<double> onDelayChanged;
   
   const PrompterControlPanel({
     super.key,
     required this.settings,
     required this.onSpeedChanged,
     required this.onFontSizeChanged,
+    required this.onDelayChanged,
   });
 
   @override
@@ -55,6 +57,18 @@ class PrompterControlPanel extends StatelessWidget {
               max: 64.0,
               divisions: 50,
               onChanged: onFontSizeChanged,
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // Контроль затримки запуску
+            _buildSliderControl(
+              label: 'Затримка: ${settings.startDelay == 0 ? 'Без затримки' : '${settings.startDelay.toStringAsFixed(1)}s'}',
+              value: settings.startDelay,
+              min: 0.0,
+              max: 10.0,
+              divisions: 20,
+              onChanged: onDelayChanged,
             ),
           ],
         ),
