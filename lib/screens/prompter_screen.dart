@@ -79,12 +79,12 @@ class _PrompterScreenState extends State<PrompterScreen> {
             // Основний текст з можливістю тапу
             Padding(
               padding: const EdgeInsets.all(20.0),
-              child: GestureDetector(
-                onTap: _controller.togglePlayPause,
-                behavior: HitTestBehavior.opaque,
-                child: SingleChildScrollView(
-                  controller: _controller.scrollController,
-                  physics: const ClampingScrollPhysics(),
+              child: SingleChildScrollView(
+                controller: _controller.scrollController,
+                physics: const ClampingScrollPhysics(),
+                child: GestureDetector(
+                  onTap: _controller.togglePlayPause,
+                  behavior: HitTestBehavior.opaque,
                   child: Transform(
                     alignment: Alignment.center,
                     transform: Matrix4.identity()..scale(
