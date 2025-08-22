@@ -86,7 +86,7 @@ class PrompterController extends ChangeNotifier {
     _isPlaying = true;
     notifyListeners();
     
-    _scrollTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+    _scrollTimer = Timer.periodic(const Duration(milliseconds: 16), (timer) {
       _scrollToNextPosition();
     });
   }
@@ -105,7 +105,8 @@ class PrompterController extends ChangeNotifier {
     if (!_isPlaying || !_scrollController.hasClients) return;
     
     final currentPosition = _scrollController.offset;
-    final scrollStep = _settings.speed * 0.3;
+    // Зменшено крок для максимальної плавності на 60 FPS
+    final scrollStep = _settings.speed * 0.5; 
     final newPosition = currentPosition + scrollStep;
     
     if (newPosition >= _scrollController.position.maxScrollExtent) {
@@ -113,11 +114,8 @@ class PrompterController extends ChangeNotifier {
       return;
     }
     
-    _scrollController.animateTo(
-      newPosition,
-      duration: Duration(milliseconds: (200 / _settings.speed).round()),
-      curve: Curves.easeOut,
-    );
+    // Використовуємо jumpTo для найплавнішої прокрутки без анімації
+    _scrollController.jumpTo(newPosition);
   }
   
   // Управління налаштуваннями
