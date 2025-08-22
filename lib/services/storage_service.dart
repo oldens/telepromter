@@ -5,6 +5,7 @@ class StorageService {
   static const String _lastModifiedKey = 'last_modified';
   static const String _speedKey = 'scroll_speed';
   static const String _fontSizeKey = 'font_size';
+  static const String _isMirroredKey = 'is_mirrored';
   
   // Збереження сценарію
   Future<void> saveScript(String text) async {
@@ -68,6 +69,27 @@ class StorageService {
     } catch (e) {
       print('Помилка завантаження розміру шрифту: $e');
       return 18.0;
+    }
+  }
+  
+  // Збереження дзеркального режиму
+  Future<void> saveMirrorMode(bool isMirrored) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_isMirroredKey, isMirrored);
+    } catch (e) {
+      print('Помилка збереження дзеркального режиму: $e');
+    }
+  }
+  
+  // Завантаження дзеркального режиму
+  Future<bool> loadMirrorMode() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getBool(_isMirroredKey) ?? false; // За замовчуванням вимкнено
+    } catch (e) {
+      print('Помилка завантаження дзеркального режиму: $e');
+      return false;
     }
   }
   

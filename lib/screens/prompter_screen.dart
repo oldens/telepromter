@@ -21,6 +21,7 @@ class _PrompterScreenState extends State<PrompterScreen> {
   bool _isPlaying = false;
   double _speed = 1.0; // пікселів за секунду
   double _fontSize = 18.0; // розмір шрифту
+  bool _isMirrored = false; // дзеркальний режим
   bool _showSpeedControl = false;
 
   @override
@@ -41,9 +42,11 @@ class _PrompterScreenState extends State<PrompterScreen> {
     try {
       final savedSpeed = await _storageService.loadSpeed();
       final savedFontSize = await _storageService.loadFontSize();
+      final savedMirrorMode = await _storageService.loadMirrorMode();
       setState(() {
         _speed = savedSpeed;
         _fontSize = savedFontSize;
+        _isMirrored = savedMirrorMode;
       });
     } catch (e) {
       print('Помилка завантаження налаштувань: $e');
@@ -89,11 +92,26 @@ class _PrompterScreenState extends State<PrompterScreen> {
       print('Помилка збереження розміру шрифту: $e');
     }
   }
+  
+  // Збереження дзеркального режиму
+  Future<void> _saveMirrorMode(bool isMirrored) async {
+    try {
+      await _storageService.saveMirrorMode(isMirrored);
+    } catch (e) {
+      print('Помилка збереження дзеркального режиму: $e');
+    }
+  }
 
   // Зміна розміру шрифту
   void _onFontSizeChanged(double fontSize) {
     setState(() => _fontSize = fontSize);
     _saveFontSize(fontSize);
+  }
+  
+  // Перемикання дзеркального режиму
+  void _onMirrorModeChanged(bool isMirrored) {
+    setState(() => _isMirrored = isMirrored);
+    _saveMirrorMode(isMirrored);
   }
 
   // Запуск прокрутки
@@ -157,6 +175,12 @@ class _PrompterScreenState extends State<PrompterScreen> {
             onPressed: _toggleSpeedControl,
             tooltip: 'Налаштування швидкості',
           ),
+          // Кнопка дзеркального режиму
+          IconButton(
+            icon: Icon(_isMirrored ? Icons.flip : Icons.flip_outlined),
+            onPressed: () => _onMirrorModeChanged(!_isMirrored),
+            tooltip: _isMirrored ? 'Вимкнути дзеркало' : 'Увімкнути дзеркало',
+          ),
           // Кнопка старт/пауза
           IconButton(
             icon: Icon(_isPlaying ? Icons.pause : Icons.play_arrow),
@@ -175,15 +199,19 @@ class _PrompterScreenState extends State<PrompterScreen> {
               child: SingleChildScrollView(
                 controller: _scrollController,
                 physics: const ClampingScrollPhysics(), // Додано для плавності
-                                 child: Text(
-                   widget.scriptText,
-                   style: TextStyle(
-                     color: const Color(0xFFFFFFFF), // Повністю непрозорий білий
-                     fontSize: _fontSize,
-                     height: 1.6,
-                     fontWeight: FontWeight.normal,
-                   ),
-                 ),
+                child: Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.identity()..scale(_isMirrored ? -1.0 : 1.0, 1.0),
+                  child: Text(
+                    widget.scriptText,
+                    style: TextStyle(
+                      color: const Color(0xFFFFFFFF), // Повністю непрозорий білий
+                      fontSize: _fontSize,
+                      height: 1.6,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ),
               ),
             ),
             
