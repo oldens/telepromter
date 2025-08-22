@@ -20,12 +20,13 @@ class _PrompterScreenState extends State<PrompterScreen> {
   Timer? _scrollTimer;
   bool _isPlaying = false;
   double _speed = 1.0; // пікселів за секунду
+  double _fontSize = 18.0; // розмір шрифту
   bool _showSpeedControl = false;
 
   @override
   void initState() {
     super.initState();
-    _loadSpeed();
+    _loadSettings();
   }
 
   @override
@@ -35,13 +36,17 @@ class _PrompterScreenState extends State<PrompterScreen> {
     super.dispose();
   }
 
-  // Завантаження збереженої швидкості
-  Future<void> _loadSpeed() async {
+  // Завантаження збережених налаштувань
+  Future<void> _loadSettings() async {
     try {
       final savedSpeed = await _storageService.loadSpeed();
-      setState(() => _speed = savedSpeed);
+      final savedFontSize = await _storageService.loadFontSize();
+      setState(() {
+        _speed = savedSpeed;
+        _fontSize = savedFontSize;
+      });
     } catch (e) {
-      print('Помилка завантаження швидкості: $e');
+      print('Помилка завантаження налаштувань: $e');
     }
   }
 
@@ -74,6 +79,21 @@ class _PrompterScreenState extends State<PrompterScreen> {
   void _onSpeedChanged(double speed) {
     setState(() => _speed = speed);
     _saveSpeed(speed);
+  }
+
+  // Збереження розміру шрифту
+  Future<void> _saveFontSize(double fontSize) async {
+    try {
+      await _storageService.saveFontSize(fontSize);
+    } catch (e) {
+      print('Помилка збереження розміру шрифту: $e');
+    }
+  }
+
+  // Зміна розміру шрифту
+  void _onFontSizeChanged(double fontSize) {
+    setState(() => _fontSize = fontSize);
+    _saveFontSize(fontSize);
   }
 
   // Запуск прокрутки
@@ -155,15 +175,15 @@ class _PrompterScreenState extends State<PrompterScreen> {
               child: SingleChildScrollView(
                 controller: _scrollController,
                 physics: const ClampingScrollPhysics(), // Додано для плавності
-                child: Text(
-                  widget.scriptText,
-                  style: const TextStyle(
-                    color: Color(0xFFFFFFFF), // Повністю непрозорий білий
-                    fontSize: 18.0,
-                    height: 1.6,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
+                                 child: Text(
+                   widget.scriptText,
+                   style: TextStyle(
+                     color: const Color(0xFFFFFFFF), // Повністю непрозорий білий
+                     fontSize: _fontSize,
+                     height: 1.6,
+                     fontWeight: FontWeight.normal,
+                   ),
+                 ),
               ),
             ),
             
@@ -172,9 +192,9 @@ class _PrompterScreenState extends State<PrompterScreen> {
               Positioned(
                 top: 20,
                 right: 20,
-                child: Container(
-                  width: 200,
-                  padding: const EdgeInsets.all(16),
+                                 child: Container(
+                   width: 220,
+                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: const Color(0xFF000000), // Повністю непрозорий чорний
                     borderRadius: BorderRadius.circular(8),
@@ -217,17 +237,57 @@ class _PrompterScreenState extends State<PrompterScreen> {
                             fontSize: 12,
                           ),
                         ),
-                        child: Slider(
-                          value: _speed,
-                          min: 0.5,
-                          max: 8.0,
-                          divisions: 75, // (8.0 - 0.5) * 10 = 75
-                          onChanged: _onSpeedChanged,
-                          label: '${_speed.toStringAsFixed(1)}x',
-                        ),
-                      ),
-                    ],
-                  ),
+                                                 child: Slider(
+                           value: _speed,
+                           min: 0.5,
+                           max: 10.0,
+                           divisions: 95, // (10.0 - 0.5) * 10 = 95
+                           onChanged: _onSpeedChanged,
+                           label: '${_speed.toStringAsFixed(1)}x',
+                         ),
+                       ),
+                       
+                       const SizedBox(height: 16),
+                       
+                       // Розмір шрифту
+                       Row(
+                         children: [
+                           const Icon(Icons.text_fields, color: Colors.white, size: 20),
+                           const SizedBox(width: 8),
+                           Text(
+                             'Шрифт: ${_fontSize.round()}px',
+                             style: const TextStyle(
+                               color: Colors.white,
+                               fontSize: 14,
+                               fontWeight: FontWeight.w500,
+                             ),
+                           ),
+                         ],
+                       ),
+                       const SizedBox(height: 12),
+                       SliderTheme(
+                         data: SliderTheme.of(context).copyWith(
+                           activeTrackColor: Colors.green,
+                           inactiveTrackColor: Colors.grey[600],
+                           thumbColor: Colors.green,
+                           overlayColor: Colors.green.withOpacity(0.2),
+                           valueIndicatorColor: Colors.green,
+                           valueIndicatorTextStyle: const TextStyle(
+                             color: Colors.white,
+                             fontSize: 12,
+                           ),
+                         ),
+                         child: Slider(
+                           value: _fontSize,
+                           min: 14.0,
+                           max: 64.0,
+                           divisions: 50, // (64 - 14) = 50
+                           onChanged: _onFontSizeChanged,
+                           label: '${_fontSize.round()}px',
+                         ),
+                       ),
+                     ],
+                   ),
                 ),
               ),
           ],

@@ -39,6 +39,7 @@ web/firebase-messaging-sw.js
 # IDE specific
 .vscode/
 .idea/
+.history/
 *.swp
 *.swo
 *~

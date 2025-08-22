@@ -4,6 +4,7 @@ class StorageService {
   static const String _scriptKey = 'script_text';
   static const String _lastModifiedKey = 'last_modified';
   static const String _speedKey = 'scroll_speed';
+  static const String _fontSizeKey = 'font_size';
   
   // Збереження сценарію
   Future<void> saveScript(String text) async {
@@ -46,6 +47,27 @@ class StorageService {
     } catch (e) {
       print('Помилка завантаження швидкості: $e');
       return 1.0;
+    }
+  }
+  
+  // Збереження розміру шрифту
+  Future<void> saveFontSize(double fontSize) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setDouble(_fontSizeKey, fontSize);
+    } catch (e) {
+      print('Помилка збереження розміру шрифту: $e');
+    }
+  }
+  
+  // Завантаження розміру шрифту
+  Future<double> loadFontSize() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getDouble(_fontSizeKey) ?? 18.0; // За замовчуванням 18.0
+    } catch (e) {
+      print('Помилка завантаження розміру шрифту: $e');
+      return 18.0;
     }
   }
   
