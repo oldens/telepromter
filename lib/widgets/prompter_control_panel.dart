@@ -17,12 +17,23 @@ class PrompterControlPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Отримуємо орієнтацію екрану
+    final orientation = MediaQuery.of(context).orientation;
+    final screenHeight = MediaQuery.of(context).size.height;
+    
+    // Адаптивне позиціонування для горизонтального режиму
+    final topPosition = orientation == Orientation.landscape 
+        ? 10.0  // Менше відступ зверху в горизонтальному режимі
+        : 80.0; // Стандартний відступ у вертикальному режимі
+        
     return Positioned(
-      top: 80,
+      top: topPosition,
       left: 20,
       right: 20,
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: orientation == Orientation.landscape 
+            ? const EdgeInsets.all(12)  // Менше відступи в горизонтальному режимі
+            : const EdgeInsets.all(20), // Стандартні відступи у вертикальному
         decoration: BoxDecoration(
           color: Colors.black.withOpacity(0.8),
           borderRadius: BorderRadius.circular(12),
@@ -34,9 +45,10 @@ class PrompterControlPanel extends StatelessWidget {
             ),
           ],
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
             // Контроль швидкості
             _buildSliderControl(
               label: 'Швидкість: ${settings.speed.toStringAsFixed(1)}x',
@@ -47,7 +59,7 @@ class PrompterControlPanel extends StatelessWidget {
               onChanged: onSpeedChanged,
             ),
             
-            const SizedBox(height: 16),
+            SizedBox(height: orientation == Orientation.landscape ? 8 : 16),
             
             // Контроль розміру шрифту
             _buildSliderControl(
@@ -59,7 +71,7 @@ class PrompterControlPanel extends StatelessWidget {
               onChanged: onFontSizeChanged,
             ),
             
-            const SizedBox(height: 16),
+            SizedBox(height: orientation == Orientation.landscape ? 8 : 16),
             
             // Контроль затримки запуску
             _buildSliderControl(
@@ -70,7 +82,8 @@ class PrompterControlPanel extends StatelessWidget {
               divisions: 20,
               onChanged: onDelayChanged,
             ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -84,27 +97,32 @@ class PrompterControlPanel extends StatelessWidget {
     required int divisions,
     required ValueChanged<double> onChanged,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Slider(
-          value: value,
-          min: min,
-          max: max,
-          divisions: divisions,
-          onChanged: onChanged,
-          label: label.split(': ').last,
-        ),
-      ],
+    return Builder(
+      builder: (context) {
+        final orientation = MediaQuery.of(context).orientation;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: orientation == Orientation.landscape ? 14 : 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            SizedBox(height: orientation == Orientation.landscape ? 4 : 8),
+            Slider(
+              value: value,
+              min: min,
+              max: max,
+              divisions: divisions,
+              onChanged: onChanged,
+              label: label.split(': ').last,
+            ),
+          ],
+        );
+      },
     );
   }
 }
