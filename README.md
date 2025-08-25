@@ -2,9 +2,11 @@
 
 > **🎬 Професійний телесуфлер з 60 FPS плавністю та розширеними налаштуваннями**
 
-[![Flutter](https://img.shields.io/badge/Flutter-3.24.5-blue.svg)](https://flutter.dev/)
-[![Android](https://img.shields.io/badge/Android-API%2036-green.svg)](https://developer.android.com/)
+[![Flutter](https://img.shields.io/badge/Flutter-3.32.7-blue.svg)](https://flutter.dev/)
+[![Android](https://img.shields.io/badge/Android-API%2021+-green.svg)](https://developer.android.com/)
+[![iOS](https://img.shields.io/badge/iOS-18.3+-blue.svg)](https://developer.apple.com/)
 [![Release](https://img.shields.io/badge/Release-v1.0.0-brightgreen.svg)](./build/app/outputs/flutter-apk/app-release.apk)
+[![GitHub](https://img.shields.io/badge/GitHub-oldens%2Ftelepromter-blue.svg)](https://github.com/oldens/telepromter)
 
 ## 🎯 Опис проекту
 
@@ -52,9 +54,10 @@
 
 ## 📱 Підтримувані платформи
 
-- **✅ Android** - API 21+ (Android 5.0+)
-- **✅ Web** - Всі сучасні браузери
-- **🔄 iOS** - готово до розробки
+- **✅ Android** - API 21+ (Android 5.0+) - Готовий APK
+- **✅ iOS** - iOS 18.3+ (iPhone 16 Pro протестовано) - Готова конфігурація
+- **✅ Web** - Всі сучасні браузери - Протестовано в Chrome
+- **✅ macOS** - Native desktop підтримка
 
 ## 🏛️ Архітектура MVC
 
@@ -74,6 +77,7 @@ telepromter/
 │   └── services/                    # Сервіси
 │       └── storage_service.dart     # SharedPreferences
 ├── android/                         # Android платформа
+├── ios/                             # iOS платформа (Runner.xcodeproj)
 └── build/app/outputs/flutter-apk/  # Production APK
     └── app-release.apk (21.2MB)    # Готовий до distribution
 ```
@@ -81,16 +85,16 @@ telepromter/
 ## 🚀 Швидкий старт
 
 ### Передумови
-- Flutter SDK 3.24.5+
-- Dart 3.5.4+
-- Android Studio / VS Code
+- Flutter SDK 3.32.7+
+- Dart 3.8.1+
+- Android Studio / VS Code / Xcode (для iOS)
 - Git
 
 ### Встановлення
 
 ```bash
 # Клонування репозиторію
-git clone <repository-url>
+git clone https://github.com/oldens/telepromter.git
 cd telepromter
 
 # Встановлення залежностей
@@ -101,6 +105,9 @@ flutter run
 
 # Збірка production APK
 flutter build apk --release
+
+# Збірка для iOS (потребує macOS + Xcode)
+flutter build ios --release
 ```
 
 ### Запуск на різних платформах
@@ -112,8 +119,14 @@ flutter run -d chrome
 # Android емулятор
 flutter run -d emulator-5554
 
-# Підключений Android пристрій
+# iOS Simulator (iPhone 16 Pro)
+flutter run -d 23B4A541-FFAE-439F-9354-6B89B752FA54
+
+# Підключений пристрій
 flutter run -d <device-id>
+
+# Перегляд доступних пристроїв
+flutter devices
 ```
 
 ## 📋 Використання
@@ -153,6 +166,9 @@ flutter run -d <device-id>
 - ✅ Countdown затримка з налаштуваннями
 - ✅ Дзеркальний режим
 - ✅ Android підтримка + production APK (21.2MB)
+- ✅ iOS підтримка + повна конфігурація (протестовано на iPhone 16 Pro)
+- ✅ Адаптивний UI для landscape режиму
+- ✅ GitHub репозиторій та версійний контроль
 
 ### 🏆 Досягнення:
 - Issue #1 (швидкість скролу) - **ВИРІШЕНО**
@@ -182,6 +198,19 @@ flutter run -d <device-id>
 
 # Встановлення APK
 adb install build/app/outputs/flutter-apk/app-release.apk
+```
+
+### iOS тестування  
+```bash
+# iOS Simulator
+open -a Simulator
+flutter run -d 23B4A541-FFAE-439F-9354-6B89B752FA54
+
+# Фізичний iPhone (потребує Developer Mode)
+flutter run --release -d <iPhone-UUID>
+
+# Перевірка доступних iOS емуляторів
+xcrun simctl list devices available
 ```
 
 ## 🔧 Розробка
@@ -230,7 +259,9 @@ class PrompterController {
 - **Загальний код**: ~20,301 рядків
 - **Розмір APK**: 21.2MB (оптимізовано)
 - **Продуктивність**: 60 FPS прокрутка
-- **Платформи**: Android (готово), Web (готово), iOS (підготовлено)
+- **Платформи**: Android ✅, iOS ✅, Web ✅, macOS ✅
+- **GitHub**: https://github.com/oldens/telepromter
+- **Останній коміт**: iOS підтримка + landscape виправлення
 
 ## 🔮 Майбутні плани
 
